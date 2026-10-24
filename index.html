@@ -64,7 +64,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,6vw,3.6rem)
 /* Platos */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
 .item{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
-.pic{display:block;width:calc(100% + 36px);max-width:none;margin:-18px -18px 2px;aspect-ratio:4/3;object-fit:cover;background:#6E4579}
+.pic{display:block;width:calc(100% + 36px);height:auto;max-width:none;margin:-18px -18px 2px;aspect-ratio:4/3;object-fit:cover;background:#6E4579}
 .item .badge{position:absolute;top:12px;left:12px;background:var(--surface);box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .item-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
 .item h3{margin:0;font-size:1.08rem;font-weight:700}
@@ -238,7 +238,7 @@ let cart=[
   {key:"capuchino|m|deslac",id:"capuchino",size:"m",milk:"deslac",qty:1,sample:true},
   {key:"pandebono||",id:"pandebono",size:"",milk:"",qty:2,sample:true}
 ];
-let mode="mesa", placed=null, error="";
+let mode="mesa", placed=null, error="", custName="";
 let stamps=6;
 try{const s=localStorage.getItem("ocobo-sellos");if(s!==null)stamps=Math.min(9,+s||0)}catch(e){}
 
@@ -349,8 +349,8 @@ function renderOrder(){
     <button class="cta" type="button" id="place" ${cart.length?"":"disabled"}>Hacer pedido · ${fmt(t.total)}</button>`;
 
   const nameEl=document.getElementById("name");
-  nameEl.value=renderOrder.name||"";
-  nameEl.oninput=()=>renderOrder.name=nameEl.value;
+  nameEl.value=custName||"";
+  nameEl.oninput=()=>custName=nameEl.value;
   el.querySelectorAll(".qty button").forEach(b=>b.onclick=()=>{
     const l=cart[+b.dataset.i];l.qty+=+b.dataset.d;l.sample=false;
     cart=cart.filter(x=>x.qty>0).map(x=>({...x,sample:false}));renderOrder();
@@ -365,7 +365,7 @@ function renderOrder(){
       wait:5+Math.min(15,tt.count*2),total:tt.total,free:tt.free};
     stamps=tt.free?0:Math.min(9,stamps+1);
     try{localStorage.setItem("ocobo-sellos",stamps)}catch(e){}
-    cart=[];error="";renderOrder.name="";renderOrder();renderCard();
+    cart=[];error="";custName="";renderOrder();renderCard();
   };
 }
 
