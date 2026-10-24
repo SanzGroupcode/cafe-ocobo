@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Café Ocobo: menú, pedidos y tarjeta de sellos. Página de demostración.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Café Ocobo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Calistoga&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F7F2F0; --surface:#FFFFFF; --ink:#2A1A14; --muted:#7A6862; --line:#E8DCD8;
+  --pink:#C93A7E; --pink-soft:#F8E1EC; --leaf:#2F6B4F; --leaf-soft:#E1EFE7; --on-accent:#FFFFFF;
+  --shadow:0 10px 30px rgba(42,26,20,.08);
+  --display:"Calistoga",Georgia,serif; --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#17100E; --surface:#231916; --ink:#F3E9E5; --muted:#B19F99; --line:#3A2C28;
+    --pink:#F27DB2; --pink-soft:#3D1F2D; --leaf:#7FC6A0; --leaf-soft:#1D3328; --on-accent:#1A0F0C;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#17100E; --surface:#231916; --ink:#F3E9E5; --muted:#B19F99; --line:#3A2C28;
+  --pink:#F27DB2; --pink-soft:#3D1F2D; --leaf:#7FC6A0; --leaf-soft:#1D3328; --on-accent:#1A0F0C;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding:0 16px 96px}
+.wrap{max-width:1120px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* Encabezado */
+.hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding-block:36px 28px;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:16px;align-items:center}
+.brand canvas{width:64px;height:64px;flex:none}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,6vw,3.6rem);line-height:1;margin:0;letter-spacing:-.01em}
+.tag{margin:6px 0 0;color:var(--muted);max-width:46ch}
+.status{display:flex;flex-direction:column;gap:6px;align-items:flex-end;text-align:right;font-size:.9rem;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;font-weight:600;font-size:.85rem}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.open{background:var(--leaf-soft);color:var(--leaf)}
+.closed{background:var(--pink-soft);color:var(--pink)}
+
+.origin{display:flex;flex-wrap:wrap;gap:8px 28px;padding-block:14px;font-size:.88rem;color:var(--muted);border-bottom:1px solid var(--line)}
+.origin b{color:var(--ink);font-weight:600}
+.origin span{white-space:nowrap}
+
+/* Layout */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:32px;padding-top:28px;align-items:start}
+
+/* Pestañas */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.tab{border:1.5px solid var(--line);background:transparent;padding:8px 16px;border-radius:999px;font-weight:600;font-size:.95rem}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+
+/* Platos */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.item-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.item h3{margin:0;font-size:1.08rem;font-weight:700}
+.price{font-weight:700;white-space:nowrap}
+.desc{margin:0;color:var(--muted);font-size:.92rem;flex:1}
+.badge{align-self:flex-start;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--pink);background:var(--pink-soft);padding:3px 8px;border-radius:6px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:transparent;border-radius:8px;padding:4px 10px;font-size:.82rem;font-weight:600}
+.chip[aria-pressed="true"]{border-color:var(--pink);color:var(--pink);background:var(--pink-soft)}
+.optlabel{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;width:100%}
+.add{background:var(--pink);color:var(--on-accent);border:0;border-radius:10px;padding:10px 14px;font-weight:700;display:flex;justify-content:space-between}
+.add:hover{filter:brightness(1.07)}
+.add.done{background:var(--leaf)}
+
+/* Pedido */
+.order{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px}
+.order h2,.stamps h2{font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0;line-height:1.1}
+.sample{font-size:.8rem;color:var(--muted);margin:-10px 0 0}
+.lines{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;max-height:320px;overflow:auto}
+.line{display:grid;grid-template-columns:1fr auto;gap:2px 12px}
+.line-name{font-weight:600}
+.line-sub{font-size:.82rem;color:var(--muted);grid-column:1}
+.qty{display:flex;align-items:center;gap:6px;grid-row:1 / span 2;grid-column:2;align-self:center}
+.qty button{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--line);background:transparent;font-weight:700;line-height:1}
+.qty span{min-width:18px;text-align:center;font-weight:700}
+.empty{color:var(--muted);font-size:.92rem;text-align:center;padding:16px 0}
+.mode{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.mode button{border:0;background:transparent;padding:9px;font-weight:600;font-size:.9rem}
+.mode button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.82rem;font-weight:600;color:var(--muted)}
+.field input,.field select{font:inherit;font-size:.95rem;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:9px 12px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.totals{border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+.totals div{display:flex;justify-content:space-between}
+.totals .grand{font-size:1.15rem;font-weight:700;margin-top:4px}
+.cta{background:var(--ink);color:var(--bg);border:0;border-radius:12px;padding:14px;font-weight:700;font-size:1rem}
+.cta:disabled{opacity:.4;cursor:not-allowed}
+.err{color:var(--pink);font-size:.85rem;margin:0}
+
+/* Confirmación */
+.ticket{border:2px dashed var(--leaf);border-radius:14px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:6px;background:var(--leaf-soft)}
+.ticket .code{font-family:var(--display);font-size:2.4rem;color:var(--leaf);line-height:1}
+.ticket p{margin:0;font-size:.92rem}
+.ticket button{margin-top:8px;border:1.5px solid var(--leaf);background:transparent;color:var(--leaf);border-radius:10px;padding:8px;font-weight:700}
+
+/* Sellos */
+.stamps{margin-top:40px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+.stamps p{margin:6px 0 0;color:var(--muted);max-width:44ch}
+.card{display:grid;grid-template-columns:repeat(5,44px);gap:10px}
+.stamp{width:44px;height:44px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:.75rem;color:var(--muted);font-weight:700}
+.stamp.on{border:2px solid var(--pink);background:var(--pink-soft);color:var(--pink)}
+.stamp.on svg{width:24px;height:24px}
+.stamp.gift{border-style:solid;border-color:var(--leaf);color:var(--leaf)}
+
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+
+/* Barra móvil */
+.bar{display:none}
+@media (max-width:860px){
+  .main{grid-template-columns:1fr}
+  .order{position:static}
+  .bar{display:flex;position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);justify-content:space-between;align-items:center;z-index:5}
+  .bar button{background:var(--pink);color:var(--on-accent);border:0;border-radius:10px;padding:10px 16px;font-weight:700}
+}
+@media (max-width:560px){
+  .hero{grid-template-columns:1fr}
+  .status{align-items:flex-start;text-align:left}
+  .stamps{grid-template-columns:1fr}
+  .card{grid-template-columns:repeat(5,1fr);max-width:280px}
+  .stamp{width:100%;aspect-ratio:1;height:auto;max-width:44px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .add,.chip,.tab{transition:background .15s,color .15s,border-color .15s}
+  .line{animation:in .25s ease-out}
+  @keyframes in{from{opacity:.3;transform:translateY(-4px)}to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="brand">
+      <canvas id="logo" width="128" height="128" aria-hidden="true"></canvas>
+      <div>
+        <h1>Café Ocobo</h1>
+        <p class="tag">Café de la Mesa de los Santos, tostado en casa. Pide desde aquí y recógelo en barra o te lo llevamos a la mesa.</p>
+      </div>
+    </div>
+    <div class="status">
+      <span id="openPill" class="pill open">Abierto</span>
+      <span id="hours">Lun a sáb 7:00 a 20:00 · Dom 8:00 a 14:00</span>
+      <span>Cabecera del Llano, Bucaramanga</span>
+    </div>
+  </header>
+
+  <div class="origin">
+    <span>Grano de la semana: <b>Finca La Esperanza</b></span>
+    <span>Altura: <b>1.650 m s. n. m.</b></span>
+    <span>Variedad: <b>Castillo y caturra</b></span>
+    <span>Tueste: <b>medio</b></span>
+    <span>Notas: <b>panela, cacao y naranja</b></span>
+  </div>
+
+  <div class="main">
+    <section aria-label="Menú">
+      <div class="tabs" role="tablist" id="tabs"></div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <aside class="order" id="order" aria-label="Tu pedido"></aside>
+  </div>
+
+  <section class="stamps" aria-label="Tarjeta de sellos">
+    <div>
+      <h2>Tarjeta de sellos</h2>
+      <p>Cada pedido suma un sello. Con 9 sellos, la décima bebida va por cuenta de la casa. Tus sellos se guardan en este navegador.</p>
+    </div>
+    <div class="card" id="card"></div>
+  </section>
+
+  <footer>
+    <span>Página de demostración: los pedidos no se envían a ningún lugar.</span>
+    <span>Precios en pesos colombianos, IVA incluido.</span>
+  </footer>
+</div>
+
+<div class="bar" id="bar">
+  <span><b id="barCount">0 productos</b> · <span class="num" id="barTotal">$0</span></span>
+  <button type="button" id="barGo">Ver pedido</button>
+</div>
+
+<script>
+const SIZES=[{id:"p",label:"8 oz",add:0},{id:"m",label:"12 oz",add:1500},{id:"g",label:"16 oz",add:3000}];
+const MILKS=[{id:"entera",label:"Entera",add:0},{id:"deslac",label:"Deslactosada",add:0},{id:"almendra",label:"Almendra",add:2000}];
+const MENU={
+  "Calientes":[
+    {id:"tinto",name:"Tinto",desc:"El de siempre, colado en tela. Pocillo de 4 oz.",price:2500},
+    {id:"americano",name:"Americano",desc:"Doble espresso alargado con agua caliente.",price:4500,sizes:true},
+    {id:"capuchino",name:"Capuchino",desc:"Espresso, leche vaporizada y bastante espuma.",price:7000,sizes:true,milk:true,badge:"El más pedido"},
+    {id:"latte",name:"Latte de panela",desc:"Latte endulzado con panela de Santander y un toque de canela.",price:8000,sizes:true,milk:true,badge:"De la casa"},
+    {id:"mocca",name:"Mocca",desc:"Espresso, chocolate de mesa y leche.",price:8500,sizes:true,milk:true},
+    {id:"aromatica",name:"Aromática de frutos rojos",desc:"Infusión de mora, fresa y hierbabuena.",price:4000}
+  ],
+  "Fríos":[
+    {id:"coldbrew",name:"Cold brew",desc:"Café reposado 18 horas en agua fría. Suave y sin amargor.",price:9000,sizes:true},
+    {id:"granizado",name:"Granizado de café",desc:"Café, hielo frappé y leche condensada.",price:10000},
+    {id:"frappe",name:"Frappé de arequipe",desc:"Licuado de café, arequipe y crema.",price:11000,milk:true},
+    {id:"limonada",name:"Limonada de coco",desc:"Limón, leche de coco y hielo. Para el calor de mediodía.",price:9500}
+  ],
+  "Para comer":[
+    {id:"pandebono",name:"Pandebono",desc:"Recién horneado, sale cada hora en punto.",price:3500},
+    {id:"arepa",name:"Arepa santandereana",desc:"Arepa de maíz pelado con chicharrón y queso.",price:7000,badge:"Típica"},
+    {id:"croissant",name:"Croissant de jamón y queso",desc:"Hojaldre de mantequilla, gratinado al momento.",price:9000},
+    {id:"sanduche",name:"Sánduche de pollo",desc:"Pan artesanal, pollo desmechado, aguacate y tomate.",price:14000}
+  ],
+  "Dulces":[
+    {id:"obleas",name:"Oblea de arequipe",desc:"Estilo Floridablanca, con arequipe y queso rallado.",price:5000,badge:"De la región"},
+    {id:"bocadillo",name:"Bocadillo veleño con queso",desc:"Bocadillo de guayaba en hoja de bijao, con queso fresco.",price:4000},
+    {id:"brownie",name:"Brownie",desc:"Chocolate 70 % con nueces.",price:6500},
+    {id:"cheesecake",name:"Cheesecake de mora",desc:"Base de galleta y mermelada de mora de Castilla.",price:10000}
+  ]
+};
+const ALL=Object.values(MENU).flat();
+const byId=id=>ALL.find(i=>i.id===id);
+const fmt=n=>"$"+n.toLocaleString("es-CO");
+
+const ui={}; // opciones elegidas por plato
+let tab="Calientes";
+let cart=[
+  {key:"capuchino|m|deslac",id:"capuchino",size:"m",milk:"deslac",qty:1,sample:true},
+  {key:"pandebono||",id:"pandebono",size:"",milk:"",qty:2,sample:true}
+];
+let mode="mesa", placed=null, error="";
+let stamps=6;
+try{const s=localStorage.getItem("ocobo-sellos");if(s!==null)stamps=Math.min(9,+s||0)}catch(e){}
+
+function unitPrice(it,size,milk){
+  let p=it.price;
+  if(size)p+=SIZES.find(s=>s.id===size).add;
+  if(milk)p+=MILKS.find(m=>m.id===milk).add;
+  return p;
+}
+function opt(id){
+  const it=byId(id);
+  if(!ui[id])ui[id]={size:it.sizes?"p":"",milk:it.milk?"entera":""};
+  return ui[id];
+}
+
+/* Pestañas y menú */
+function renderTabs(){
+  const el=document.getElementById("tabs");
+  el.innerHTML=Object.keys(MENU).map(t=>`<button class="tab" role="tab" id="tab-${t.replace(/\s/g,'')}" aria-selected="${t===tab}">${t}</button>`).join("");
+  el.querySelectorAll(".tab").forEach((b,i)=>b.onclick=()=>{tab=Object.keys(MENU)[i];renderTabs();renderGrid()});
+}
+function renderGrid(){
+  const g=document.getElementById("grid");
+  g.innerHTML=MENU[tab].map(it=>{
+    const o=opt(it.id);
+    const sizes=it.sizes?`<div class="opts"><span class="optlabel">Tamaño</span>${SIZES.map(s=>`<button class="chip" data-k="size" data-v="${s.id}" aria-pressed="${o.size===s.id}">${s.label}${s.add?` +${fmt(s.add)}`:""}</button>`).join("")}</div>`:"";
+    const milk=it.milk?`<div class="opts"><span class="optlabel">Leche</span>${MILKS.map(m=>`<button class="chip" data-k="milk" data-v="${m.id}" aria-pressed="${o.milk===m.id}">${m.label}${m.add?` +${fmt(m.add)}`:""}</button>`).join("")}</div>`:"";
+    return `<article class="item" data-id="${it.id}">
+      ${it.badge?`<span class="badge">${it.badge}</span>`:""}
+      <div class="item-top"><h3>${it.name}</h3><span class="price num">${fmt(unitPrice(it,o.size,o.milk))}</span></div>
+      <p class="desc">${it.desc}</p>${sizes}${milk}
+      <button class="add" type="button"><span>Agregar</span><span>+</span></button>
+    </article>`;
+  }).join("");
+  g.querySelectorAll(".item").forEach(card=>{
+    const id=card.dataset.id;
+    card.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{opt(id)[c.dataset.k]=c.dataset.v;renderGrid()});
+    card.querySelector(".add").onclick=e=>{
+      addToCart(id);
+      const b=e.currentTarget;b.classList.add("done");b.innerHTML="<span>Agregado</span><span>✓</span>";
+      setTimeout(()=>{b.classList.remove("done");b.innerHTML="<span>Agregar</span><span>+</span>"},1100);
+    };
+  });
+}
+
+/* Carrito */
+function addToCart(id){
+  const o=opt(id), key=`${id}|${o.size}|${o.milk}`;
+  cart=cart.filter(l=>!l.sample||l.key===key).map(l=>({...l,sample:false}));
+  const ex=cart.find(l=>l.key===key);
+  if(ex)ex.qty++;else cart.push({key,id,size:o.size,milk:o.milk,qty:1});
+  placed=null;error="";renderOrder();
+}
+function totals(){
+  const sub=cart.reduce((s,l)=>s+unitPrice(byId(l.id),l.size,l.milk)*l.qty,0);
+  const count=cart.reduce((s,l)=>s+l.qty,0);
+  const free=stamps>=9&&cart.length?Math.max(...cart.filter(l=>byId(l.id).sizes||byId(l.id).milk||["tinto","aromatica","granizado","limonada"].includes(l.id)).map(l=>unitPrice(byId(l.id),l.size,l.milk)),0):0;
+  return {sub,count,free,total:sub-free};
+}
+function lineSub(l){
+  const bits=[];
+  if(l.size)bits.push(SIZES.find(s=>s.id===l.size).label);
+  if(l.milk)bits.push("leche "+MILKS.find(m=>m.id===l.milk).label.toLowerCase());
+  bits.push(fmt(unitPrice(byId(l.id),l.size,l.milk))+" c/u");
+  return bits.join(" · ");
+}
+function renderOrder(){
+  const el=document.getElementById("order");
+  const t=totals();
+  document.getElementById("barCount").textContent=`${t.count} ${t.count===1?"producto":"productos"}`;
+  document.getElementById("barTotal").textContent=fmt(t.total);
+
+  if(placed){
+    el.innerHTML=`<h2>¡Pedido recibido!</h2>
+      <div class="ticket"><p>Tu número de pedido</p><span class="code num">${placed.code}</span>
+      <p>${placed.mode==="mesa"?`Te lo llevamos a la mesa ${placed.table}`:"Recógelo en la barra"} en unos ${placed.wait} minutos, ${placed.name}.</p>
+      <p class="num"><b>Total: ${fmt(placed.total)}</b>${placed.free?" (incluye bebida gratis)":""}</p>
+      <button type="button" id="again">Hacer otro pedido</button></div>`;
+    document.getElementById("again").onclick=()=>{placed=null;renderOrder()};
+    return;
+  }
+
+  const hasSample=cart.some(l=>l.sample);
+  el.innerHTML=`<h2>Tu pedido</h2>
+    ${hasSample?`<p class="sample">Pedido de ejemplo. Al agregar algo del menú se reemplaza por el tuyo.</p>`:""}
+    ${cart.length?`<ul class="lines">${cart.map((l,i)=>`<li class="line">
+        <span class="line-name">${byId(l.id).name}</span>
+        <span class="line-sub num">${lineSub(l)}</span>
+        <span class="qty"><button type="button" data-i="${i}" data-d="-1" aria-label="Quitar uno">−</button><span class="num">${l.qty}</span><button type="button" data-i="${i}" data-d="1" aria-label="Agregar uno">+</button></span>
+      </li>`).join("")}</ul>`:`<p class="empty">Todavía no has agregado nada. Elige algo del menú.</p>`}
+    <div class="mode" role="group" aria-label="Cómo lo recibes">
+      <button type="button" data-m="mesa" aria-pressed="${mode==="mesa"}">En la mesa</button>
+      <button type="button" data-m="llevar" aria-pressed="${mode==="llevar"}">Para llevar</button>
+    </div>
+    <div class="fields">
+      <label class="field">Tu nombre<input id="name" autocomplete="given-name" placeholder="Ej. Laura"></label>
+      ${mode==="mesa"
+        ?`<label class="field">Mesa<select id="table">${Array.from({length:12},(_,i)=>`<option>${i+1}</option>`).join("")}</select></label>`
+        :`<label class="field">Recoges a las<select id="pickup"><option>Lo antes posible</option><option>En 15 min</option><option>En 30 min</option></select></label>`}
+    </div>
+    <div class="totals num">
+      <div><span>Subtotal</span><span>${fmt(t.sub)}</span></div>
+      ${t.free?`<div style="color:var(--leaf)"><span>Bebida gratis (tarjeta llena)</span><span>−${fmt(t.free)}</span></div>`:""}
+      <div class="grand"><span>Total</span><span>${fmt(t.total)}</span></div>
+    </div>
+    ${error?`<p class="err">${error}</p>`:""}
+    <button class="cta" type="button" id="place" ${cart.length?"":"disabled"}>Hacer pedido · ${fmt(t.total)}</button>`;
+
+  const nameEl=document.getElementById("name");
+  nameEl.value=renderOrder.name||"";
+  nameEl.oninput=()=>renderOrder.name=nameEl.value;
+  el.querySelectorAll(".qty button").forEach(b=>b.onclick=()=>{
+    const l=cart[+b.dataset.i];l.qty+=+b.dataset.d;l.sample=false;
+    cart=cart.filter(x=>x.qty>0).map(x=>({...x,sample:false}));renderOrder();
+  });
+  el.querySelectorAll(".mode button").forEach(b=>b.onclick=()=>{mode=b.dataset.m;renderOrder()});
+  document.getElementById("place").onclick=()=>{
+    const name=nameEl.value.trim();
+    if(!name){error="Escribe tu nombre para llamarte cuando esté listo.";renderOrder();document.getElementById("name").focus();return}
+    const tt=totals();
+    placed={code:"#"+(100+Math.floor(Math.random()*900)),name,mode,
+      table:mode==="mesa"?document.getElementById("table").value:"",
+      wait:5+Math.min(15,tt.count*2),total:tt.total,free:tt.free};
+    stamps=tt.free?0:Math.min(9,stamps+1);
+    try{localStorage.setItem("ocobo-sellos",stamps)}catch(e){}
+    cart=[];error="";renderOrder.name="";renderOrder();renderCard();
+  };
+}
+
+/* Tarjeta de sellos */
+const BEAN=`<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="12" rx="7" ry="9.5" transform="rotate(30 12 12)" fill="currentColor"/><path d="M8.5 5.5c3 3 4 9 7 13" stroke="var(--pink-soft)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`;
+function renderCard(){
+  document.getElementById("card").innerHTML=Array.from({length:10},(_,i)=>{
+    if(i===9)return `<span class="stamp gift" title="Bebida gratis">Gratis</span>`;
+    return i<stamps?`<span class="stamp on" title="Sello ${i+1}">${BEAN}</span>`:`<span class="stamp">${i+1}</span>`;
+  }).join("");
+}
+
+/* Horario */
+function renderStatus(){
+  const d=new Date(),day=d.getDay(),h=d.getHours()+d.getMinutes()/60;
+  const open=day===0?(h>=8&&h<14):(h>=7&&h<20);
+  const p=document.getElementById("openPill");
+  p.className="pill "+(open?"open":"closed");
+  p.textContent=open?"Abierto ahora":"Cerrado ahora · puedes dejar tu pedido listo";
+}
+
+/* Logo: flor de ocobo dibujada */
+function drawLogo(){
+  const c=document.getElementById("logo"),x=c.getContext("2d");
+  const pink=getComputedStyle(document.documentElement).getPropertyValue("--pink").trim();
+  const ink=getComputedStyle(document.documentElement).getPropertyValue("--ink").trim();
+  x.clearRect(0,0,128,128);x.translate(64,64);
+  for(let i=0;i<5;i++){
+    x.save();x.rotate(i*Math.PI*2/5);
+    x.beginPath();x.moveTo(0,0);x.bezierCurveTo(-26,-18,-20,-56,0,-58);x.bezierCurveTo(20,-56,26,-18,0,0);
+    x.fillStyle=pink;x.globalAlpha=.9;x.fill();x.restore();
+  }
+  x.globalAlpha=1;x.beginPath();x.ellipse(0,0,13,17,Math.PI/6,0,Math.PI*2);x.fillStyle=ink;x.fill();
+  x.beginPath();x.moveTo(-5,-13);x.quadraticCurveTo(4,0,3,14);x.strokeStyle=pink;x.lineWidth=2.5;x.stroke();
+  x.setTransform(1,0,0,1,0,0);
+}
+
+document.getElementById("barGo").onclick=()=>document.getElementById("order").scrollIntoView({behavior:"smooth"});
+renderTabs();renderGrid();renderOrder();renderCard();renderStatus();drawLogo();
+setInterval(renderStatus,60000);
+new MutationObserver(drawLogo).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",drawLogo);
+</script>
+</body>
+</html>
